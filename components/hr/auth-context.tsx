@@ -8,6 +8,7 @@ interface AuthContextValue {
   currentUser: User | null
   isLoggedIn: boolean
   login: (userId: string) => void
+  loginWithUser: (user: User) => void
   logout: () => void
   setCurrentUser: (user: User) => void
   allUsers: User[]
@@ -23,6 +24,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (user) setCurrentUser(user)
   }
 
+  function loginWithUser(user: User) {
+    setCurrentUser(user)
+  }
+
   function logout() {
     setCurrentUser(null)
   }
@@ -32,6 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       currentUser,
       isLoggedIn: !!currentUser,
       login,
+      loginWithUser,
       logout,
       setCurrentUser,
       allUsers: MOCK_USERS,

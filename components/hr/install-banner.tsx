@@ -16,6 +16,10 @@ export function InstallBanner() {
 
   useEffect(() => {
     setMounted(true)
+    if (localStorage.getItem("install-banner-dismissed")) {
+      setDismissed(true)
+      return
+    }
     if (window.matchMedia("(display-mode: standalone)").matches) {
       setIsInstalled(true)
       return
@@ -27,6 +31,8 @@ export function InstallBanner() {
     window.addEventListener("beforeinstallprompt", handler)
     return () => window.removeEventListener("beforeinstallprompt", handler)
   }, [])
+
+  if (!mounted || isInstalled || dismissed) return null
 
   async function handleInstall() {
     if (!deferredPrompt) return
@@ -40,13 +46,6 @@ export function InstallBanner() {
     setDismissed(true)
     localStorage.setItem("install-banner-dismissed", "1")
   }
-
-  // Don't render until mounted (avoids SSR mismatch)
-  if (!mounted) return null
-  if (isInstalled) return null
-  if (dismissed) return null
-  // Check localStorage after mount
-  if (typeof window !== "undefined" && localStorage.getItem("install-banner-dismissed")) return null
 
   return (
     <div className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 px-4 py-2.5 flex items-center justify-between gap-3">

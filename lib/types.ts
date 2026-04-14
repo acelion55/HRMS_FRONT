@@ -1,6 +1,6 @@
 export type TicketType = "BUG" | "SERVICE_REQUEST"
 
-export type Role = "EMPLOYEE" | "HR_COORDINATOR" | "HR_SPECIALIST" | "HR_MANAGER" | "SYSTEM_ADMIN"
+export type Role = "EMPLOYEE" | "HR_COORDINATOR" | "HR_SPECIALIST" | "HR_MANAGER" | "SYSTEM_ADMIN" | "SPECIAL_OFFICER"
 
 export type TicketStatus = "OPEN" | "IN_PROGRESS" | "PENDING" | "RESOLVED" | "CLOSED"
 
@@ -38,6 +38,7 @@ export type Permission =
   | "DELETE_TICKET"
   | "VIEW_ANALYTICS"
   | "MANAGE_ROLES"
+  | "MANAGE_USERS"
   | "VIEW_AUDIT_LOGS"
   | "ASSIGN_TICKET"
 

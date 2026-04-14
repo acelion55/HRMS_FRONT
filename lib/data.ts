@@ -240,21 +240,48 @@ async function safeFetchJson(path: string, options?: RequestInit) {
 }
 
 export async function fetchTicketsFromDb() {
+  try { return await safeFetchJson("/api/tickets") }
+  catch { return tickets }
+}
+
+export async function fetchUsersFromDb() {
+  try { return await safeFetchJson("/api/users") }
+  catch { return MOCK_USERS }
+}
+
+export async function loginFromDb(email: string, password: string) {
   try {
-    return await safeFetchJson("/api/tickets")
-  } catch (error) {
-    console.error("fetchTicketsFromDb failed", error)
-    return tickets
-  }
+    return await safeFetchJson("/api/users/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    })
+  } catch { return null }
+}
+
+export async function createUserOnDb(userData: Omit<User, "id"> & { password?: string }) {
+  try {
+    return await safeFetchJson("/api/users", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(userData),
+    })
+  } catch { return null }
+}
+
+export async function patchUserOnDb(userId: string, update: Partial<User> & { password?: string }) {
+  try {
+    return await safeFetchJson(`/api/users/${userId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(update),
+    })
+  } catch { return null }
 }
 
 export async function fetchAuditLogsFromDb() {
-  try {
-    return await safeFetchJson("/api/audit-logs")
-  } catch (error) {
-    console.error("fetchAuditLogsFromDb failed", error)
-    return auditLogs
-  }
+  try { return await safeFetchJson("/api/audit-logs") }
+  catch { return auditLogs }
 }
 
 export async function createTicketOnDb(ticketData: Omit<Ticket, "id" | "createdAt" | "updatedAt" | "deletedAt" | "comments">) {

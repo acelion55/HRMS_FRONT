@@ -4,7 +4,7 @@ import { useState, useCallback, useRef, useEffect } from "react"
 import {
   Ticket, BarChart2, Shield, Users, Plus,
   Lock, Bell, Menu, X,
-  AlertTriangle, Clock, UserX, CheckCircle2, LogOut, ArrowLeft, UserCircle, Calendar, FileText
+  AlertTriangle, Clock, UserX, CheckCircle2, LogOut, ArrowLeft, UserCircle, Calendar, FileText, UserPlus
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
@@ -17,27 +17,30 @@ import { CreateTicketForm } from "./create-ticket"
 import { Analytics } from "./analytics"
 import { AuditLogViewer } from "./audit-log"
 import { RoleManagement } from "./role-management"
+import { UserManagement } from "./user-management"
 import { ProfilePage } from "./profile"
 import TicketTemplates from "./ticket-templates"
 import { EmployeeDirectory } from "./employee-directory"
 import type { Ticket as TicketType, Role } from "@/lib/types"
 
-type View = "tickets" | "analytics" | "audit" | "roles" | "profile" | "directory" | "templates"
+type View = "tickets" | "analytics" | "audit" | "roles" | "users" | "profile" | "directory" | "templates"
 
 const ROLE_COLORS: Record<Role, string> = {
-  EMPLOYEE:       "bg-yellow-50 text-yellow-800 border-yellow-300",
-  HR_COORDINATOR: "bg-blue-50 text-blue-700 border-blue-200",
-  HR_SPECIALIST:  "bg-purple-50 text-purple-700 border-purple-200",
-  HR_MANAGER:     "bg-green-50 text-green-700 border-green-200",
-  SYSTEM_ADMIN:   "bg-orange-50 text-orange-700 border-orange-200",
+  EMPLOYEE:        "bg-yellow-50 text-yellow-800 border-yellow-300",
+  HR_COORDINATOR:  "bg-blue-50 text-blue-700 border-blue-200",
+  HR_SPECIALIST:   "bg-purple-50 text-purple-700 border-purple-200",
+  HR_MANAGER:      "bg-green-50 text-green-700 border-green-200",
+  SYSTEM_ADMIN:    "bg-orange-50 text-orange-700 border-orange-200",
+  SPECIAL_OFFICER: "bg-rose-50 text-rose-700 border-rose-200",
 }
 
 const ROLE_BADGE_SOLID: Record<Role, string> = {
-  EMPLOYEE:       "bg-yellow-500",
-  HR_COORDINATOR: "bg-blue-500",
-  HR_SPECIALIST:  "bg-purple-500",
-  HR_MANAGER:     "bg-green-500",
-  SYSTEM_ADMIN:   "bg-orange-500",
+  EMPLOYEE:        "bg-yellow-500",
+  HR_COORDINATOR:  "bg-blue-500",
+  HR_SPECIALIST:   "bg-purple-500",
+  HR_MANAGER:      "bg-green-500",
+  SYSTEM_ADMIN:    "bg-orange-500",
+  SPECIAL_OFFICER: "bg-rose-500",
 }
 
 export function HRDashboard({ onBack }: { onBack?: () => void } = {}) {
@@ -103,6 +106,7 @@ export function HRDashboard({ onBack }: { onBack?: () => void } = {}) {
   const canViewAnalytics = hasPermission(currentUser.role, "VIEW_ANALYTICS")
   const canViewAuditLogs = hasPermission(currentUser.role, "VIEW_AUDIT_LOGS")
   const canManageRoles = hasPermission(currentUser.role, "MANAGE_ROLES")
+  const canManageUsers = hasPermission(currentUser.role, "MANAGE_USERS")
 
   const navItems = [
     { id: "tickets" as View,   label: "Tickets",         icon: <Ticket className="h-4 w-4" />,         show: true },
@@ -111,6 +115,7 @@ export function HRDashboard({ onBack }: { onBack?: () => void } = {}) {
     { id: "analytics" as View, label: "Analytics",       icon: <BarChart2 className="h-4 w-4" />,      show: canViewAnalytics },
     { id: "audit" as View,     label: "Audit Log",       icon: <Shield className="h-4 w-4" />,         show: canViewAuditLogs },
     { id: "roles" as View,     label: "Role Management", icon: <Users className="h-4 w-4" />,          show: canManageRoles },
+    { id: "users" as View,     label: "Users",           icon: <UserPlus className="h-4 w-4" />,        show: canManageUsers },
     { id: "profile" as View,   label: "My Profile",      icon: <UserCircle className="h-4 w-4" />,     show: true },
   ].filter((n) => n.show)
 
@@ -265,7 +270,7 @@ export function HRDashboard({ onBack }: { onBack?: () => void } = {}) {
             </button>
           )}
           <h1 className="text-sm font-bold text-gray-800">
-            {view === "tickets" ? "Support Tickets" : view === "analytics" ? "Analytics" : view === "audit" ? "Audit Log" : view === "roles" ? "Role Management" : "My Profile"}
+            {view === "tickets" ? "Support Tickets" : view === "analytics" ? "Analytics" : view === "audit" ? "Audit Log" : view === "roles" ? "Role Management" : view === "users" ? "Users" : "My Profile"}
           </h1>
           <div className="ml-auto flex items-center gap-3">
             {/* Quick Actions */}
@@ -489,6 +494,11 @@ export function HRDashboard({ onBack }: { onBack?: () => void } = {}) {
               {view === "roles" && (
                 <div className="flex-1 min-h-0 overflow-y-auto bg-yellow-50">
                   <RoleManagement />
+                </div>
+              )}
+              {view === "users" && (
+                <div className="flex-1 min-h-0 overflow-y-auto bg-yellow-50">
+                  <UserManagement />
                 </div>
               )}
               {view === "profile" && (

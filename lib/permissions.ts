@@ -36,6 +36,7 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
   ],
   SYSTEM_ADMIN: [
     "MANAGE_ROLES",
+    "MANAGE_USERS",
     "VIEW_AUDIT_LOGS",
     "VIEW_ANALYTICS",
     "READ_ALL_TICKETS",
@@ -46,6 +47,16 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     "POST_PUBLIC_COMMENT",
     "CREATE_TICKET",
   ],
+  SPECIAL_OFFICER: [
+    "CREATE_TICKET",
+    "READ_ALL_TICKETS",
+    "UPDATE_STATUS",
+    "POST_PUBLIC_COMMENT",
+    "POST_INTERNAL_NOTE",
+    "ASSIGN_TICKET",
+    "VIEW_ANALYTICS",
+    "VIEW_AUDIT_LOGS",
+  ],
 }
 
 // ─── Role Hierarchy (higher index = more authority) ───────────────────────────
@@ -54,6 +65,7 @@ export const ROLE_HIERARCHY: Role[] = [
   "HR_COORDINATOR",
   "HR_SPECIALIST",
   "HR_MANAGER",
+  "SPECIAL_OFFICER",
   "SYSTEM_ADMIN",
 ]
 
@@ -70,7 +82,7 @@ export const SENSITIVE_CATEGORIES: TicketCategory[] = ["GRIEVANCE", "MEDICAL"]
 
 export function canAccessSensitiveCategory(role: Role, category: TicketCategory): boolean {
   if (!SENSITIVE_CATEGORIES.includes(category)) return true
-  return role === "HR_MANAGER" || role === "SYSTEM_ADMIN"
+  return role === "HR_MANAGER" || role === "SYSTEM_ADMIN" || role === "SPECIAL_OFFICER"
 }
 
 // ─── Row-Level Security ───────────────────────────────────────────────────────

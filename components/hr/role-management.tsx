@@ -9,19 +9,21 @@ import { useAuth } from "./auth-context"
 import { cn } from "@/lib/utils"
 
 const ROLE_COLORS: Record<Role, string> = {
-  EMPLOYEE:       "bg-yellow-50 text-yellow-800 border-yellow-300",
-  HR_COORDINATOR: "bg-blue-50 text-blue-700 border-blue-200",
-  HR_SPECIALIST:  "bg-purple-50 text-purple-700 border-purple-200",
-  HR_MANAGER:     "bg-green-50 text-green-700 border-green-200",
-  SYSTEM_ADMIN:   "bg-orange-50 text-orange-700 border-orange-200",
+  EMPLOYEE:        "bg-yellow-50 text-yellow-800 border-yellow-300",
+  HR_COORDINATOR:  "bg-blue-50 text-blue-700 border-blue-200",
+  HR_SPECIALIST:   "bg-purple-50 text-purple-700 border-purple-200",
+  HR_MANAGER:      "bg-green-50 text-green-700 border-green-200",
+  SYSTEM_ADMIN:    "bg-orange-50 text-orange-700 border-orange-200",
+  SPECIAL_OFFICER: "bg-rose-50 text-rose-700 border-rose-200",
 }
 
 const ROLE_DESCRIPTIONS: Record<Role, string> = {
-  EMPLOYEE:       "Can only see/edit their own tickets",
-  HR_COORDINATOR: "First responder — view & assign tickets",
-  HR_SPECIALIST:  "Case owner — full access to assigned tickets",
-  HR_MANAGER:     "Overseer — view all tickets, analytics, delete",
-  SYSTEM_ADMIN:   "Technical lead — roles, configs, audit logs",
+  EMPLOYEE:        "Can only see/edit their own tickets",
+  HR_COORDINATOR:  "First responder — view & assign tickets",
+  HR_SPECIALIST:   "Case owner — full access to assigned tickets",
+  HR_MANAGER:      "Overseer — view all tickets, analytics, delete",
+  SYSTEM_ADMIN:    "Technical lead — roles, configs, audit logs",
+  SPECIAL_OFFICER: "Cross-functional — view all, audit, analytics",
 }
 
 export function RoleManagement() {

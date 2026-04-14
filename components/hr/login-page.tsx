@@ -4,36 +4,29 @@ import { useState } from "react"
 import { Ticket, Eye, EyeOff, LogIn } from "lucide-react"
 import { useAuth } from "./auth-context"
 import { InstallBanner } from "./install-banner"
-
-const MAIN_USERS = [
-  { id: "u1", username: "alice.johnson", password: "alice123" },
-  { id: "u2", username: "bob.martinez",  password: "bob123"   },
-  { id: "u3", username: "carol.white",   password: "carol123" },
-  { id: "u4", username: "david.lee",     password: "david123" },
-  { id: "u5", username: "eva.chen",      password: "eva123"   },
-  { id: "u6", username: "frank.admin",   password: "frank123" },
-]
+import { loginFromDb } from "@/lib/data"
 
 export function LoginPage() {
-  const { login } = useAuth()
-  const [username, setUsername] = useState("")
+  const { loginWithUser } = useAuth()
+  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError("")
     setLoading(true)
-    setTimeout(() => {
-      const trimUser = username.trim().toLowerCase()
-      const match = MAIN_USERS.find((u) => u.username === trimUser)
-      if (!match) { setError("Username not found."); setLoading(false); return }
-      if (password !== match.password) { setError("Incorrect password."); setLoading(false); return }
-      login(match.id)
-      setLoading(false)
-    }, 500)
+
+    const trimEmail = email.trim().toLowerCase()
+    const dbUser = await loginFromDb(trimEmail, password)
+    if (dbUser && dbUser.id) {
+      loginWithUser(dbUser)
+    } else {
+      setError("Invalid email or password.")
+    }
+    setLoading(false)
   }
 
   return (
@@ -55,12 +48,13 @@ export function LoginPage() {
         <div className="bg-white rounded-2xl border border-yellow-200 shadow-sm p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Username</label>
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Email</label>
               <input
-                value={username}
-                onChange={(e) => { setUsername(e.target.value); setError("") }}
-                placeholder="e.g. alice.johnson"
-                autoComplete="username"
+                value={email}
+                onChange={(e) => { setEmail(e.target.value); setError("") }}
+                placeholder="e.g. alice@company.com"
+                type="email"
+                autoComplete="email"
                 required
                 className="w-full rounded-xl bg-gray-50 border border-gray-200 text-gray-800 placeholder:text-gray-400 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 focus:bg-white transition-colors"
               />
