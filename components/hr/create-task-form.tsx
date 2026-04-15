@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import {
   ArrowLeft, Ticket, MapPin, Building2, FolderOpen,
   AlignLeft, Tag, UserCheck, Paperclip, FileText,
@@ -9,7 +9,7 @@ import {
 import { cn } from "@/lib/utils"
 import type { TicketCategory, TicketPriority, Department, TicketType } from "@/lib/types"
 import { useAuth } from "./auth-context"
-import { createTicket, addAuditLog, createTicketOnDb, addAuditLogOnDb, MOCK_USERS } from "@/lib/data"
+import { createTicket, addAuditLog, createTicketOnDb, addAuditLogOnDb, fetchUsersFromDb } from "@/lib/data"
 import { SENSITIVE_CATEGORIES } from "@/lib/permissions"
 import { toast } from "sonner"
 
@@ -44,11 +44,16 @@ export function CreateTaskForm({ onBack, onCreated }: Props) {
   const [assigneeId, setAssigneeId] = useState("")
   const [attachments, setAttachments] = useState<AttachmentFile[]>([])
   const [submitted, setSubmitted] = useState(false)
+  const [allUsers, setAllUsers] = useState<import("@/lib/types").User[]>([])
   const fileRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    fetchUsersFromDb().then(setAllUsers)
+  }, [])
 
   if (!currentUser) return null
   const user = currentUser
-  const assignableUsers = MOCK_USERS.filter((u) => u.role !== "SYSTEM_ADMIN" && u.id !== user.id)
+  const assignableUsers = allUsers.filter((u) => u.role !== "SYSTEM_ADMIN" && u.id !== user.id)
 
   function handleFiles(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? [])
@@ -65,7 +70,7 @@ export function CreateTaskForm({ onBack, onCreated }: Props) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!title.trim() || !description.trim()) return
-    const assignee = MOCK_USERS.find((u) => u.id === assigneeId)
+    const assignee = allUsers.find((u) => u.id === assigneeId)
 
     const payload = {
       title: title.trim(),

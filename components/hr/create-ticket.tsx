@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { X, AlertTriangle, Paperclip, FileText, ImageIcon, Trash2, Tag, AlignLeft, Building2, ChevronDown, UserCheck } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { TicketCategory, TicketPriority, Department, Ticket } from "@/lib/types"
 import { useAuth } from "./auth-context"
-import { createTicket, addAuditLog, createTicketOnDb, addAuditLogOnDb, MOCK_USERS } from "@/lib/data"
+import { createTicket, addAuditLog, createTicketOnDb, addAuditLogOnDb, fetchUsersFromDb } from "@/lib/data"
 import { SENSITIVE_CATEGORIES, canAssignTicket } from "@/lib/permissions"
 import { toast } from "sonner"
 
@@ -42,16 +42,20 @@ export function CreateTicketForm({ onClose, onCreated, template }: Props) {
   const [department, setDepartment] = useState<Department>(currentUser?.department ?? "ENGINEERING")
   const [assigneeId, setAssigneeId] = useState<string>("")
   const [attachments, setAttachments] = useState<AttachmentFile[]>([])
+  const [allUsers, setAllUsers] = useState<import("@/lib/types").User[]>([])
   const fileRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    fetchUsersFromDb().then(setAllUsers)
+  }, [])
 
   if (!currentUser) return null
   const user = currentUser
-  const hrUsers = MOCK_USERS.filter((u) => ["HR_COORDINATOR", "HR_SPECIALIST", "HR_MANAGER"].includes(u.role))
   const showAssign = canAssignTicket(user)
   // Employees assign to HR only; HR roles can assign to anyone
   const assignableUsers = user.role === "EMPLOYEE"
-    ? MOCK_USERS.filter((u) => ["HR_COORDINATOR", "HR_SPECIALIST", "HR_MANAGER"].includes(u.role))
-    : MOCK_USERS.filter((u) => u.id !== user.id)
+    ? allUsers.filter((u) => ["HR_COORDINATOR", "HR_SPECIALIST", "HR_MANAGER"].includes(u.role))
+    : allUsers.filter((u) => u.id !== user.id)
 
   function handleFiles(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? [])
@@ -83,7 +87,7 @@ export function CreateTicketForm({ onClose, onCreated, template }: Props) {
       creatorId: user.id,
       creatorName: user.name,
       assigneeId: assigneeId || null,
-      assigneeName: MOCK_USERS.find((u) => u.id === assigneeId)?.name ?? null,
+      assigneeName: allUsers.find((u) => u.id === assigneeId)?.name ?? null,
     }
 
     const localTicket = createTicket(payload)
